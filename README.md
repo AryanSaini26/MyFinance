@@ -29,7 +29,4 @@ This repository contains MyFinance, a personal finance management application. M
 
 5. Generate financial reports.
 
-## Updates
-
-Final Version, almost ready to be deployed (Sept 19/23)
 

@@ -1,2 +1,2 @@
-# MyFinance2
+# MyFinance
  

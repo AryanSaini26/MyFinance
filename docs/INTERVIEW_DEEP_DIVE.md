@@ -10,16 +10,16 @@ Do not claim production users, scale, real-bank connectivity, financial returns,
 
 A **frontend** displays information and accepts input. A **backend** checks that input, verifies the user, applies rules and asks the database to store or retrieve information. A **database** enforces durable relationships between records. An **external API** such as Plaid may fail or return data before your own database has saved anything.
 
-| Piece | Actual purpose | Start reading here |
-| --- | --- | --- |
-| Next.js/React/TypeScript | Browser dashboard plus same-origin Node route handlers | `apps/web/src/app/page.tsx`, `app/api/[...path]/route.ts` |
-| Central API boundary | Origin checks, session lookup, handler selection and safe errors | `apps/web/src/lib/api.ts` |
-| Domain handlers | Accounts, authentication, transactions, connections and reporting | `apps/web/src/lib/routes/` |
-| PostgreSQL | Users, ownership, numeric money, constraints and atomic commits | `database/migrations/001_initial.sql` |
-| Go service | Item locking, fetch pagination/retries, transaction writes and cursor | `services/sync/internal/syncer/` |
-| Plaid | Simulated provider Link/token/account/transaction APIs | `apps/web/src/lib/plaid.ts`, Go `plaid.go` |
-| Naive Bayes | Small explainable text-category prediction | `packages/classifier/classifier.ts`, Go `model.go` |
-| Compose / Actions | Reproducible development processes and automated checks | `compose.yaml`, `.github/workflows/ci.yml` |
+| Piece                    | Actual purpose                                                        | Start reading here                                        |
+| ------------------------ | --------------------------------------------------------------------- | --------------------------------------------------------- |
+| Next.js/React/TypeScript | Browser dashboard plus same-origin Node route handlers                | `apps/web/src/app/page.tsx`, `app/api/[...path]/route.ts` |
+| Central API boundary     | Origin checks, session lookup, handler selection and safe errors      | `apps/web/src/lib/api.ts`                                 |
+| Domain handlers          | Accounts, authentication, transactions, connections and reporting     | `apps/web/src/lib/routes/`                                |
+| PostgreSQL               | Users, ownership, numeric money, constraints and atomic commits       | `database/migrations/001_initial.sql`                     |
+| Go service               | Item locking, fetch pagination/retries, transaction writes and cursor | `services/sync/internal/syncer/`                          |
+| Plaid                    | Simulated provider Link/token/account/transaction APIs                | `apps/web/src/lib/plaid.ts`, Go `plaid.go`                |
+| Naive Bayes              | Small explainable text-category prediction                            | `packages/classifier/classifier.ts`, Go `model.go`        |
+| Compose / Actions        | Reproducible development processes and automated checks               | `compose.yaml`, `.github/workflows/ci.yml`                |
 
 Why these technologies? Next.js keeps frontend and API in one process; TypeScript helps catch shape errors; Go demonstrates explicit cancellation/concurrency and transaction management; PostgreSQL fits related financial data; Plaid Sandbox simulates external bank behavior without real accounts; Naive Bayes is understandable without a large model service. Docker and CI make setup/checks repeatable. Go is a project requirement and learning choice, not proof that Node was too slow.
 
@@ -57,7 +57,7 @@ The browser requests a Link token. In Sandbox mode, Node uses the official Plaid
 
 Node fetches account metadata and encrypts the private token using AES-256-GCM. It inserts the Item, account rows and initial sync state in one transaction. The private token is never returned to the browser. If persistence fails, Node attempts to revoke the new remote Item; this is best-effort compensation, not distributed atomicity.
 
-Mock mode performs the same local encryption/persistence and synchronization flow with a deterministic provider adapter; it does not claim to exercise Plaid's hosted Link UI. Real Sandbox credentials were unavailable during development, so SDK contract tests mock the SDK and Go HTTP adapter tests use an in-process test server.
+Mock mode performs the same local encryption/persistence and synchronization flow with a deterministic provider adapter; it does not claim to exercise Plaid's hosted Link UI. Deterministic SDK contract tests mock the SDK and Go HTTP adapter tests use an in-process test server. A subsequent live Sandbox backend smoke passed token creation/exchange, account metadata, Go transaction sync, durable cursors and Item removal. It bypasses hosted Link using Plaid's supported automated Sandbox token endpoint; the hosted popup remains a manual check.
 
 ## 5. Complete synchronization walkthrough
 
@@ -87,18 +87,18 @@ The PostgreSQL advisory lock works across multiple Go processes, unlike a proces
 
 ## 6. Boundaries and alternatives worth defending
 
-| Decision | Benefit | Cost / viable alternative |
-| --- | --- | --- |
-| Same Next app for frontend/API | One origin and fewer processes | Separate Express service offers independent scaling/versioning. |
-| Dedicated Go sync service | Explicit context/locking and service boundary | Node-only sync would be simpler operationally. |
-| Direct SQL | Visible queries and transaction boundaries | ORM/query builder could improve typed results and reduce boilerplate. |
-| Database sessions | Immediate current-session revocation and simple expiry | DB lookup per request; signed tokens need separate revocation planning. |
-| Item lock across network | Easy-to-explain serial batch consistency | Long transactions; staging plus leases/fencing would reduce lock duration. |
-| Whole-batch buffer | Restart safely on mutation; no partial committed pages | Memory and transaction duration grow with page count; capped here. |
-| Tombstones | Keep audit context and user overrides | Retains removed data; a retention policy is still needed. |
-| Synthetic Naive Bayes | Explainable and private training data | No representative real-world accuracy estimate. |
-| Signed numeric amounts | Exact database sums, readable API | Not a double-entry ledger; no FX or accounting reconciliation. |
-| Manual polling | No publicly reachable webhook required | Users must request sync; no scheduler/freshness guarantee. |
+| Decision                       | Benefit                                                | Cost / viable alternative                                                  |
+| ------------------------------ | ------------------------------------------------------ | -------------------------------------------------------------------------- |
+| Same Next app for frontend/API | One origin and fewer processes                         | Separate Express service offers independent scaling/versioning.            |
+| Dedicated Go sync service      | Explicit context/locking and service boundary          | Node-only sync would be simpler operationally.                             |
+| Direct SQL                     | Visible queries and transaction boundaries             | ORM/query builder could improve typed results and reduce boilerplate.      |
+| Database sessions              | Immediate current-session revocation and simple expiry | DB lookup per request; signed tokens need separate revocation planning.    |
+| Item lock across network       | Easy-to-explain serial batch consistency               | Long transactions; staging plus leases/fencing would reduce lock duration. |
+| Whole-batch buffer             | Restart safely on mutation; no partial committed pages | Memory and transaction duration grow with page count; capped here.         |
+| Tombstones                     | Keep audit context and user overrides                  | Retains removed data; a retention policy is still needed.                  |
+| Synthetic Naive Bayes          | Explainable and private training data                  | No representative real-world accuracy estimate.                            |
+| Signed numeric amounts         | Exact database sums, readable API                      | Not a double-entry ledger; no FX or accounting reconciliation.             |
+| Manual polling                 | No publicly reachable webhook required                 | Users must request sync; no scheduler/freshness guarantee.                 |
 
 ## 7. Failure scenarios
 
@@ -185,56 +185,56 @@ The browser suite exercises the built app, real Node-to-Go HTTP, both services' 
 
 ## 10. Glossary
 
-| Term | Meaning in this application |
-| --- | --- |
-| API | An interface through which the browser or another process requests behavior. |
-| HTTP method | GET reads; POST creates/actions; PATCH changes selected fields; DELETE disconnects a resource here. |
-| Status code | Machine-readable result category, e.g. 201 created, 401 unauthenticated, 409 conflict. |
-| REST | Resource-oriented HTTP design style; this API also uses action endpoints for sync and Link. |
-| Route handler | Backend function serving a URL/method. |
-| Authentication | Establishing which user owns the session. |
-| Authorization | Checking that identity may access a selected record. |
-| Session | A server-side record mapping an opaque token digest to a user until expiry. |
-| Cookie | Browser-managed request data; here it carries a bearer session token. |
-| Bearer token | A credential whose possession grants its allowed access. Keep the raw value secret. |
-| Hash | One-way digest; passwords require a deliberately expensive password-hashing algorithm. |
-| Salt | Random per-password input preventing shared hashes/precomputation. |
-| scrypt | Memory-hard password derivation used before password storage/verification. |
-| Encryption | Reversible secret-key protection for data needed later, e.g. Plaid tokens. |
-| AES-GCM | Authenticated encryption combining confidentiality with a tamper-detection tag. |
-| Nonce | Per-encryption unique/random value; GCM nonces must not repeat under the same key. |
-| CSRF | Inducing a browser to make unwanted authenticated requests from another site. |
-| XSS | Attacker-controlled script executing in the application's browser origin. |
-| SQL injection | User data being interpreted as SQL syntax; parameterization separates them. |
-| Parameterized query | SQL with separately bound values, such as owner ID in `$1`. |
-| Foreign key | Database constraint ensuring a referenced parent row exists. |
-| Composite key | A key across multiple columns, here often resource plus owner or Item. |
-| Unique constraint | Database-enforced prohibition on repeated key tuples. |
-| Index | Auxiliary structure helping some lookups/orderings at write/storage cost. |
-| Migration | Versioned SQL change applied to move schema forward. |
-| Connection pool | Reusable database connections; a transaction keeps one checked-out connection. |
-| ACID | Atomicity, consistency, isolation and durability properties of database transactions. |
-| Atomicity | Either every statement's changes commit, or none do. |
-| COMMIT / ROLLBACK | Make a transaction durable / discard its uncommitted changes. |
-| Advisory lock | Application-selected database lock key used to coordinate Item sync operations. |
-| Deadlock | Transactions wait in a cycle; PostgreSQL can abort one. The app doesn't automatically retry DB deadlocks. |
-| Idempotency | Repeating an operation doesn't create additional unintended durable effects. |
-| Upsert | Insert a row or update an existing row on a specified unique conflict. |
-| Cursor | Opaque provider checkpoint used to retrieve subsequent incremental changes. |
-| Pagination | Fetching a dataset/change window in successive bounded pages. |
-| Backoff | Waiting longer between retries to avoid immediately repeating failures. |
-| Tombstone | Marker retaining a removed transaction while excluding it from ordinary reads. |
-| Eventual consistency | External provider state reaches local storage after a successful later sync, not instantly. |
-| Compensation | Best-effort action reversing an external effect when a local step fails. |
-| Outbox | Durable work record used to reliably retry external side effects; proposed here, not implemented. |
-| Naive Bayes | Classifier combining word statistics under a conditional-independence assumption. |
-| Laplace smoothing | Adding a count so unseen word/class pairs don't get zero likelihood. |
-| Log likelihood | Logarithm of a probability contribution; sums replace tiny repeated products. |
-| Model drift | Real input patterns change from those represented by training data. |
-| Unit test | Focused test of behavior with dependencies controlled or isolated. |
-| Integration test | Test exercising real component boundaries, e.g. handlers with PostgreSQL. |
-| End-to-end test | Browser workflow across the built UI, application API, Go service and database. |
-| CI | Automated checks run on repository events; configuration alone is not a passing run. |
+| Term                 | Meaning in this application                                                                               |
+| -------------------- | --------------------------------------------------------------------------------------------------------- |
+| API                  | An interface through which the browser or another process requests behavior.                              |
+| HTTP method          | GET reads; POST creates/actions; PATCH changes selected fields; DELETE disconnects a resource here.       |
+| Status code          | Machine-readable result category, e.g. 201 created, 401 unauthenticated, 409 conflict.                    |
+| REST                 | Resource-oriented HTTP design style; this API also uses action endpoints for sync and Link.               |
+| Route handler        | Backend function serving a URL/method.                                                                    |
+| Authentication       | Establishing which user owns the session.                                                                 |
+| Authorization        | Checking that identity may access a selected record.                                                      |
+| Session              | A server-side record mapping an opaque token digest to a user until expiry.                               |
+| Cookie               | Browser-managed request data; here it carries a bearer session token.                                     |
+| Bearer token         | A credential whose possession grants its allowed access. Keep the raw value secret.                       |
+| Hash                 | One-way digest; passwords require a deliberately expensive password-hashing algorithm.                    |
+| Salt                 | Random per-password input preventing shared hashes/precomputation.                                        |
+| scrypt               | Memory-hard password derivation used before password storage/verification.                                |
+| Encryption           | Reversible secret-key protection for data needed later, e.g. Plaid tokens.                                |
+| AES-GCM              | Authenticated encryption combining confidentiality with a tamper-detection tag.                           |
+| Nonce                | Per-encryption unique/random value; GCM nonces must not repeat under the same key.                        |
+| CSRF                 | Inducing a browser to make unwanted authenticated requests from another site.                             |
+| XSS                  | Attacker-controlled script executing in the application's browser origin.                                 |
+| SQL injection        | User data being interpreted as SQL syntax; parameterization separates them.                               |
+| Parameterized query  | SQL with separately bound values, such as owner ID in `$1`.                                               |
+| Foreign key          | Database constraint ensuring a referenced parent row exists.                                              |
+| Composite key        | A key across multiple columns, here often resource plus owner or Item.                                    |
+| Unique constraint    | Database-enforced prohibition on repeated key tuples.                                                     |
+| Index                | Auxiliary structure helping some lookups/orderings at write/storage cost.                                 |
+| Migration            | Versioned SQL change applied to move schema forward.                                                      |
+| Connection pool      | Reusable database connections; a transaction keeps one checked-out connection.                            |
+| ACID                 | Atomicity, consistency, isolation and durability properties of database transactions.                     |
+| Atomicity            | Either every statement's changes commit, or none do.                                                      |
+| COMMIT / ROLLBACK    | Make a transaction durable / discard its uncommitted changes.                                             |
+| Advisory lock        | Application-selected database lock key used to coordinate Item sync operations.                           |
+| Deadlock             | Transactions wait in a cycle; PostgreSQL can abort one. The app doesn't automatically retry DB deadlocks. |
+| Idempotency          | Repeating an operation doesn't create additional unintended durable effects.                              |
+| Upsert               | Insert a row or update an existing row on a specified unique conflict.                                    |
+| Cursor               | Opaque provider checkpoint used to retrieve subsequent incremental changes.                               |
+| Pagination           | Fetching a dataset/change window in successive bounded pages.                                             |
+| Backoff              | Waiting longer between retries to avoid immediately repeating failures.                                   |
+| Tombstone            | Marker retaining a removed transaction while excluding it from ordinary reads.                            |
+| Eventual consistency | External provider state reaches local storage after a successful later sync, not instantly.               |
+| Compensation         | Best-effort action reversing an external effect when a local step fails.                                  |
+| Outbox               | Durable work record used to reliably retry external side effects; proposed here, not implemented.         |
+| Naive Bayes          | Classifier combining word statistics under a conditional-independence assumption.                         |
+| Laplace smoothing    | Adding a count so unseen word/class pairs don't get zero likelihood.                                      |
+| Log likelihood       | Logarithm of a probability contribution; sums replace tiny repeated products.                             |
+| Model drift          | Real input patterns change from those represented by training data.                                       |
+| Unit test            | Focused test of behavior with dependencies controlled or isolated.                                        |
+| Integration test     | Test exercising real component boundaries, e.g. handlers with PostgreSQL.                                 |
+| End-to-end test      | Browser workflow across the built UI, application API, Go service and database.                           |
+| CI                   | Automated checks run on repository events; configuration alone is not a passing run.                      |
 
 ## 11. Suggested learning order
 

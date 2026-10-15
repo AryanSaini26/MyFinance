@@ -1,6 +1,6 @@
 # Get free Plaid Sandbox keys
 
-MyFinance's account connection is implemented, but testing with Plaid's real Sandbox servers requires keys from your own developer account. Mock mode continues working without them. Sandbox uses simulated financial data and is free; this project does not need a Production/Trial application or a real bank login.
+MyFinance's account connection is implemented and its real Sandbox backend smoke test has passed. Reproducing that test requires keys from your own developer account. Mock mode continues working without them. Sandbox uses simulated financial data and is free; this project does not need a Production/Trial application or a real bank login.
 
 ## 1. Create the developer account
 
@@ -11,9 +11,9 @@ Open https://dashboard.plaid.com/signup, register with your own email and verify
 Open **Build → Sandbox** in the dashboard. Sandbox Studio displays your Sandbox API keys. Depending on the dashboard version, an **API Keys** page may also be available under Build. You need:
 
 | Plaid dashboard value | MyFinance setting |
-| --- | --- |
-| client_id | PLAID_CLIENT_ID |
-| Sandbox secret | PLAID_SECRET |
+| --------------------- | ----------------- |
+| client_id             | PLAID_CLIENT_ID   |
+| Sandbox secret        | PLAID_SECRET      |
 
 Choose the Sandbox secret, never a Production secret. A Link bank-login username/password such as user_good/pass_good is a test institution login, not your application's API key.
 
@@ -54,3 +54,5 @@ Requires Go on PATH. The test creates a temporary app user, calls real Sandbox t
 Keep PLAID_MODE=mock while resolving account access. If the signup form requires an option you cannot truthfully satisfy, report the field/options without exposing credentials; don't apply for a paid plan to bypass it. The existing implementation and offline tests remain usable. No live Sandbox success should be claimed until the smoke test has actually passed.
 
 Official sources: [Sandbox overview](https://plaid.com/docs/sandbox/), [Sandbox Studio](https://plaid.com/docs/sandbox/studio/), [Quickstart](https://plaid.com/docs/quickstart/). New accounts receive Sandbox access by default; see [Plaid CLI account setup](https://plaid.com/docs/resources/cli/#getting-started).
+
+The completed backend smoke used transient environment credentials and disconnected its temporary Item successfully. It does not establish a hosted Link popup pass. Rotate any secret shared in chat, keep the replacement private and configure it locally using the settings above.

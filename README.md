@@ -48,18 +48,18 @@ The web app is on port 3000 and the internal sync service on 8080. Manual sync r
 
 ## Configuration
 
-| Variable | Purpose |
-| --- | --- |
-| `DATABASE_URL` | PostgreSQL connection URL. Example uses `sslmode=disable` for localhost development only. TLS validation is never globally disabled. |
-| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | Compose database provisioning; keep these consistent with DATABASE_URL when running natively. |
-| `APP_ORIGIN` | Exact browser origin including scheme and port; required on all API mutations, including curl requests. |
-| `COOKIE_SECURE` | `false` only for local HTTP. Default when unset is secure cookies; use true for HTTPS. |
-| `TOKEN_ENCRYPTION_KEY` | 64 hex characters encoding a 32-byte AES-GCM key, shared by web and Go. Changing it without re-encryption makes existing tokens unreadable. |
-| `SYNC_SERVICE_SECRET` | At least 32 random characters; web authenticates internal sync requests with it. |
-| `SYNC_SERVICE_URL` | Go service origin; overridden to `http://sync:8080` by Compose. |
-| `PLAID_MODE` | `mock` or `sandbox`. No production mode exists. |
-| `PLAID_ENV` | Must be `sandbox` for API calls. |
-| `PLAID_CLIENT_ID`, `PLAID_SECRET` | Sandbox keys from your Plaid dashboard; ignored by the local mock. Never use NEXT_PUBLIC variables for secrets. |
+| Variable                                            | Purpose                                                                                                                                     |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                                      | PostgreSQL connection URL. Example uses `sslmode=disable` for localhost development only. TLS validation is never globally disabled.        |
+| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | Compose database provisioning; keep these consistent with DATABASE_URL when running natively.                                               |
+| `APP_ORIGIN`                                        | Exact browser origin including scheme and port; required on all API mutations, including curl requests.                                     |
+| `COOKIE_SECURE`                                     | `false` only for local HTTP. Default when unset is secure cookies; use true for HTTPS.                                                      |
+| `TOKEN_ENCRYPTION_KEY`                              | 64 hex characters encoding a 32-byte AES-GCM key, shared by web and Go. Changing it without re-encryption makes existing tokens unreadable. |
+| `SYNC_SERVICE_SECRET`                               | At least 32 random characters; web authenticates internal sync requests with it.                                                            |
+| `SYNC_SERVICE_URL`                                  | Go service origin; overridden to `http://sync:8080` by Compose.                                                                             |
+| `PLAID_MODE`                                        | `mock` or `sandbox`. No production mode exists.                                                                                             |
+| `PLAID_ENV`                                         | Must be `sandbox` for API calls.                                                                                                            |
+| `PLAID_CLIENT_ID`, `PLAID_SECRET`                   | Sandbox keys from your Plaid dashboard; ignored by the local mock. Never use NEXT_PUBLIC variables for secrets.                             |
 
 ## Plaid Sandbox
 
@@ -71,7 +71,7 @@ New to Plaid? Follow [the free Sandbox account/key guide](docs/PLAID_SANDBOX_SET
 4. After Link completes, the backend exchanges the public token, fetches metadata, encrypts the access token and stores the Item and accounts atomically. Choose Sync; if the initial response is empty, wait and retry after Sandbox data becomes ready.
 5. Disconnect revokes the Sandbox Item and clears its stored token. Historical transactions remain visible; linked accounts become inactive.
 
-Do not switch modes with active Items from the other mode: disconnect them in their original mode first or use a separate fresh database. Live Sandbox testing was not performed without credentials. Official references: [Quickstart](https://plaid.com/docs/quickstart/), [Transactions integration](https://plaid.com/docs/transactions/), [sync API](https://plaid.com/docs/api/products/transactions/#transactionssync). This implementation uses manual polling, not webhooks or paid refresh endpoints.
+Do not switch modes with active Items from the other mode: disconnect them in their original mode first or use a separate fresh database. The live Sandbox backend smoke test passed, including real account metadata, Go transaction synchronization, durable cursor storage and Item removal; the hosted Link popup remains a manual verification step. Official references: [Quickstart](https://plaid.com/docs/quickstart/), [Transactions integration](https://plaid.com/docs/transactions/), [sync API](https://plaid.com/docs/api/products/transactions/#transactionssync). This implementation uses manual polling, not webhooks or paid refresh endpoints.
 
 ## Repository structure
 
@@ -133,7 +133,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-The browser suite starts web and Go automatically; leave those ports free. It needs a prior web build and the app environment (APP_ORIGIN, COOKIE_SECURE, TOKEN_ENCRYPTION_KEY, SYNC_SERVICE_SECRET, SYNC_SERVICE_URL, PLAID_MODE and PLAID_ENV). Ensure Go is on PATH. Go tests skip integration cases when TEST_DATABASE_URL is absent and print the skip reason; that is not evidence of integration success. [GitHub Actions](.github/workflows/ci.yml) provisions PostgreSQL, runs these checks, audits runtime dependencies, and validates/builds Compose containers. The feature branch and [draft PR #1](https://github.com/AryanSaini26/MyFinance/pull/1) are published; see docs/VERIFICATION.md for observed remote results.
+The browser suite starts web and Go automatically; leave those ports free. It needs a prior web build and the app environment (APP_ORIGIN, COOKIE_SECURE, TOKEN_ENCRYPTION_KEY, SYNC_SERVICE_SECRET, SYNC_SERVICE_URL, PLAID_MODE and PLAID_ENV). Ensure Go is on PATH. Go tests skip integration cases when TEST_DATABASE_URL is absent and print the skip reason; that is not evidence of integration success. [GitHub Actions](.github/workflows/ci.yml) provisions PostgreSQL, runs these checks, audits runtime dependencies, and validates/builds Compose containers. The feature branch and [PR #1](https://github.com/AryanSaini26/MyFinance/pull/1) are published; see docs/VERIFICATION.md for observed remote results.
 
 ## Disposable Docker integration tests
 
@@ -153,7 +153,7 @@ DATABASE_URL="$TEST_DATABASE_URL" npm run db:migrate
 npm run test:sandbox
 ```
 
-Requires Go on PATH and PostgreSQL. The command creates a synthetic app user, requests a real Sandbox Link token, uses Plaid's Sandbox-only public-token endpoint, exchanges it through the application backend, fetches accounts, starts an isolated Go service, syncs transactions/cursor, repeats sync, and disconnects the temporary Item. It then deletes its own synthetic user; if remote disconnection fails, recovery state stays encrypted in the test database. It never truncates that database. Missing configuration fails before network calls. The hosted Link popup still needs a manual browser check. The live smoke test was not executed without credentials.
+Requires Go on PATH and PostgreSQL. The command creates a synthetic app user, requests a real Sandbox Link token, uses Plaid's Sandbox-only public-token endpoint, exchanges it through the application backend, fetches accounts, starts an isolated Go service, syncs transactions/cursor, repeats sync, and disconnects the temporary Item. It then deletes its own synthetic user; if remote disconnection fails, recovery state stays encrypted in the test database. It never truncates that database. Missing configuration fails before network calls. The hosted Link popup still needs a manual browser check. The live backend smoke test passed against Plaid Sandbox; see the verification record.
 
 ## Classification
 

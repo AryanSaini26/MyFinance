@@ -24,6 +24,6 @@
 
 ## Scope limits to keep visible
 
-No paid service, live bank, public deployment, force push, main merge, destructive history rewrite or original-database migration is part of this change. Live Sandbox needs credentials. The feature branch and draft PR #1 are published; no merge is authorized. Production-grade identity, background webhooks/scheduling, FX, a ledger, operational reconciliation/outbox and benchmark claims are outside the implemented scope.
+No paid service, live bank, public deployment, force push, main merge, destructive history rewrite or original-database migration is part of this change. The real Sandbox backend smoke passed; the hosted Link popup still needs a manual check. The feature branch and PR #1 are published; no merge is authorized. Production-grade identity, background webhooks/scheduling, FX, a ledger, operational reconciliation/outbox and benchmark claims are outside the implemented scope.
 
 The completion follow-up adds a disposable Docker integration runner and live Sandbox smoke-test command. `docs/COMPLETION_CHECKLIST.md` maps every résumé claim to code, tests and remaining account-dependent verification.

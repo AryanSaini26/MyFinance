@@ -1,0 +1,68 @@
+name: MyFinance v2 checks
+on:
+  push:
+    branches: [main, feature/myfinance-v2]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-bookworm
+        env:
+          POSTGRES_USER: myfinance
+          POSTGRES_PASSWORD: ci_only
+          POSTGRES_DB: myfinance_test
+        ports: [5432:5432]
+        options: >-
+          --health-cmd="pg_isready -U myfinance -d myfinance_test"
+          --health-interval=3s --health-timeout=3s --health-retries=20
+    env:
+      DATABASE_URL: postgres://myfinance:ci_only@127.0.0.1:5432/myfinance_test?sslmode=disable
+      TEST_DATABASE_URL: postgres://myfinance:ci_only@127.0.0.1:5432/myfinance_test?sslmode=disable
+      APP_ORIGIN: http://localhost:3000
+      COOKIE_SECURE: "false"
+      TOKEN_ENCRYPTION_KEY: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      SYNC_SERVICE_SECRET: ci-only-internal-service-secret-at-least-32
+      SYNC_SERVICE_URL: http://127.0.0.1:8080
+      PLAID_MODE: mock
+      PLAID_ENV: sandbox
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "24", cache: npm }
+      - uses: actions/setup-go@v5
+        with:
+          { go-version: "1.26", cache-dependency-path: services/sync/go.sum }
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run model:train && git diff --exit-code -- packages/classifier/model.json services/sync/internal/syncer/model.json
+      - run: npm run preview:build
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run db:migrate && npm run db:migrate
+      - run: npm run test:integration
+      - run: go test -race -count=1 -v ./... && go vet ./... && test -z "$(gofmt -l .)"
+        working-directory: services/sync
+      - run: npm audit --omit=dev --audit-level=moderate
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - name: Validate container configuration and builds
+        run: |
+          cp .env.example .env
+          docker compose config --quiet
+          docker compose build
+      - name: Run disposable Docker integration tests
+        run: npm run test:docker
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/

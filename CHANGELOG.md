@@ -1,3 +1,9 @@
+## [2.0.0] 2026-10-14 — modernization branch
+
+Implemented Next.js/TypeScript application and sessions, PostgreSQL migrations and ownership constraints, Plaid Sandbox/mock connections, Go incremental transaction synchronization, CSV imports, budgets, explainable categorization, tests and development/CI configuration. See docs/REVIEW_SUMMARY.md and docs/VERIFICATION.md. Deployment and merge are not part of this change.
+
+The earlier entries below are preserved from the original repository and are not claims about v2 implementation history.
+
 ## [1.3.0] 2023-05-06
 
 🐛 Bugs solved:

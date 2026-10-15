@@ -1,22 +1,46 @@
 {
+  "name": "myfinance-v2",
+  "version": "2.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/web"
+  ],
   "engines": {
-    "node": "20.2.0"
+    "node": ">=22"
   },
   "scripts": {
-    "start": "node src/backend/server.js",
-    "sitemap": "babel-node ./sitemap-builder.js"
+    "dev": "npm run dev -w apps/web",
+    "build": "npm run build -w apps/web",
+    "start": "npm run start -w apps/web",
+    "typecheck": "tsc --noEmit -p apps/web/tsconfig.json",
+    "test": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "db:migrate": "node --import tsx scripts/migrate.ts",
+    "model:train": "node --import tsx scripts/train.ts",
+    "test:e2e": "playwright test",
+    "format": "prettier --write apps/web/src apps/web/next.config.ts packages/classifier/*.ts preview/*.ts preview/*.tsx preview/*.html scripts tests *.ts *.json .github/workflows/*.yml compose*.yaml",
+    "format:check": "prettier --check apps/web/src apps/web/next.config.ts packages/classifier/*.ts preview/*.ts preview/*.tsx preview/*.html scripts tests *.ts *.json .github/workflows/*.yml compose*.yaml",
+    "env:init": "node scripts/env-init.mjs",
+    "test:docker": "node scripts/test-docker.mjs",
+    "check:node": "node scripts/check-node.mjs",
+    "test:sandbox": "node --import tsx scripts/sandbox-smoke.mjs",
+    "preview:build": "node scripts/build-preview.mjs"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0"
+    "@playwright/test": "^1.58.2",
+    "@tailwindcss/forms": "^0.5.11",
+    "@types/aos": "^3.0.8",
+    "@types/node": "^24.0.0",
+    "@types/pg": "^8.15.0",
+    "@types/prop-types": "^15.7.15",
+    "autoprefixer": "^10.6.1",
+    "esbuild": "^0.28.2",
+    "postcss-import": "^16.2.0",
+    "prettier": "^3.9.10",
+    "tailwindcss": "^3.4.19",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vitest": "^4.0.0"
   },
-  "dependencies": {
-    "ajv": "^8.12.0",
-    "cookie-parser": "^1.4.6",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "multer": "^1.4.5-lts.1",
-    "natural": "^6.7.2",
-    "pg": "^8.11.3"
-  }
+  "type": "module"
 }

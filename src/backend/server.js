@@ -1,6 +1,8 @@
-/*
+throw new Error('Legacy server is disabled. Use npm run dev for MyFinance v2. See docs/AUDIT.md.');
+/* Archived implementation, retained for historical review only.
+
 This file is the starting point of the server
-*/
+
 
 
 
@@ -37,7 +39,7 @@ const pool = new Pool({
 });
 
 
-/*
+
 
 const pass = require('../password');
 const pool = new Pool({
@@ -47,7 +49,7 @@ const pool = new Pool({
   port: 5432,
   database: 'userDatabase'
 });
-/*
+
 
 
 const pool = new Pool({
@@ -57,7 +59,7 @@ const pool = new Pool({
   port: 5432,
   database: 'postgres'
 });
-*/
+
 
 
 //Register Route
@@ -93,3 +95,5 @@ initializePool();
 //Connection confirmation
 app.listen(PORT, () => console.log(`Server is listening on ${PORT}`));
 
+
+*/

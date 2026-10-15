@@ -1,0 +1,9 @@
+@import "../original/home/css/style.css";
+@import "aos/dist/aos.css";
+:root {
+  --font-inter: "Inter";
+  --font-architects-daughter: "Architects Daughter";
+}
+body {
+  margin: 0;
+}

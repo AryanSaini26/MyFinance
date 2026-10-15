@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:16-bookworm
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-myfinance}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-myfinance}
+    ports: ["127.0.0.1:5432:5432"]
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  migrate:
+    build: { context: ., dockerfile: apps/web/Dockerfile }
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-myfinance}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-myfinance}
+    depends_on:
+      db: { condition: service_healthy }
+    command: ["npm", "run", "db:migrate"]
+  sync:
+    build: { context: ., dockerfile: services/sync/Dockerfile }
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-myfinance}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-myfinance}?sslmode=disable
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    # Internal network only. The browser never talks to this service.
+    expose: ["8080"]
+  web:
+    build: { context: ., dockerfile: apps/web/Dockerfile }
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-myfinance}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-myfinance}
+      SYNC_SERVICE_URL: http://sync:8080
+    ports: ["127.0.0.1:3000:3000"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      sync: { condition: service_started }
+volumes:
+  postgres_data:

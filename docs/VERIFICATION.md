@@ -1,6 +1,6 @@
 # Verification record
 
-This document records executed local checks, not expected CI outcomes. The final source build and browser workflow completed successfully.
+This document records executed checks, not expected outcomes. The implementation passed local checks and [GitHub Actions run 38665315899](https://github.com/AryanSaini26/MyFinance/actions/runs/38665315899) at published code commit fde4942844eb10b2324e31911a8031a8088e44cb. The remote run completed successfully, including real Docker image builds and the disposable Docker integration-test stack. The only remaining external verification is live Plaid Sandbox, pending developer keys.
 
 ## Environment
 
@@ -34,11 +34,11 @@ The coding environment permits only one mapped root UID and disallows Unix socke
 
 Wrong credentials, duplicate registration, expired/revoked sessions, wrong/missing origins, malformed/oversized CSV, invalid dates, excessive precision, cross-user account writes and category overrides, composite FK violation, duplicate manual keys, repeated/conflicting CSV external IDs, category overrides/clearing, budget exclusion of pending/transfer records, wrong-user Item operations, provider HTTP retries, permanent failure, pagination cycle/page limit, mutation restart/exhaustion, missing account, failed transaction SQL, failed final cursor write, and concurrent synchronization. See the test source for exact assertions rather than inferring broader coverage.
 
-## Not executed / blocked
+## Initial environment limitations and current status
 
 - **Live Plaid Sandbox:** no Sandbox credentials were supplied. Node SDK contracts and Go HTTP/provider behavior use mocks and local test servers. Hosted Link's real UI and real Sandbox responses remain to be verified.
-- **Docker Compose execution/build:** Docker CLI/daemon are unavailable in this environment. YAML parsing/static review is not a successful Docker build. CI includes Compose config/build checks, but no remote CI pass is claimed.
-- **Remote GitHub Actions:** branch publication is blocked by GitHub integration write permissions; no remote run is claimed.
+- **Docker Compose execution/build:** unavailable in the local coding sandbox, but subsequently executed successfully in GitHub Actions, including application image builds and the separate containerized integration suites.
+- **Remote GitHub Actions:** authorization was resolved and the full remote job passed. Draft PR #1 is published and remains unmerged.
 - No load test, representative accuracy study, container security scan, penetration test or public deployment occurred.
 
 ## Initial failures and fixes
@@ -55,3 +55,7 @@ The normal HTTPS Git push was also attempted and failed because this coding envi
 - Added an opt-in live Sandbox backend smoke test that starts an isolated Go service, exercises actual Sandbox token/account/sync endpoints through the app handlers, and cleans up its own synthetic records/remote Item. Its missing-credentials guard executed and exited with an explicit not-run message. No live Sandbox pass is claimed.
 - Re-executed Node/PostgreSQL (10 passed), Go/PostgreSQL with race detection (18 top-level tests passed), Go vet and the browser workflow (passed). The Docker runner was invoked and correctly failed because Docker is unavailable. The Compose test structure parsed and passed static assertions; that is not container execution.
 - Rechecked GitHub identity: authenticated as AryanSaini26; installation/account discovery returned empty lists. Retried feature-branch creation and received the same 403 insufficient-integration-permissions response. No GitHub-side repository authorization tool is exposed. This cannot be repaired by changing this repository or merely allowing ChatGPT actions.
+
+## Successful remote CI — 2026-10-14
+
+[Run 38665315899](https://github.com/AryanSaini26/MyFinance/actions/runs/38665315899) / job 116195815875 completed with conclusion **success** on commit fde4942844eb10b2324e31911a8031a8088e44cb. All source, PostgreSQL, Go race/vet, audit, optimized-build, browser, Compose-build and containerized-integration steps passed. This remote run uses normal GitHub-hosted Docker/PostgreSQL; it does not depend on the local UID/stat compatibility shim. Earlier blocker descriptions above are retained as development history and are superseded by this result. Live Plaid Sandbox remains untested without credentials.

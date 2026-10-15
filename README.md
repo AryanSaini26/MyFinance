@@ -17,7 +17,7 @@ Open http://localhost:3000, choose **Create an account**, and use a password of 
 
 `env:init` creates an ignored `.env` with independent random database, token-encryption and internal-service secrets; it refuses to overwrite an existing file. `.env.example` contains placeholders. Keep `.env` private. Compose starts PostgreSQL, runs migrations, then starts web and sync. The database and web ports bind only to localhost; sync has no published port. `docker compose down` retains the database volume.
 
-Container builds were not executable in the implementation environment because Docker was unavailable. See [executed verification and outstanding checks](docs/VERIFICATION.md), not CI configuration alone, for test evidence.
+Application container builds and the disposable Docker integration suites passed in [GitHub Actions](https://github.com/AryanSaini26/MyFinance/actions/runs/38665315899). See [executed verification and outstanding checks](docs/VERIFICATION.md) for details.
 
 ## Run without Docker
 
@@ -62,6 +62,8 @@ The web app is on port 3000 and the internal sync service on 8080. Manual sync r
 | `PLAID_CLIENT_ID`, `PLAID_SECRET` | Sandbox keys from your Plaid dashboard; ignored by the local mock. Never use NEXT_PUBLIC variables for secrets. |
 
 ## Plaid Sandbox
+
+New to Plaid? Follow [the free Sandbox account/key guide](docs/PLAID_SANDBOX_SETUP.md).
 
 1. Obtain developer Sandbox keys from [Plaid's dashboard](https://dashboard.plaid.com/). Set `PLAID_MODE=sandbox`, `PLAID_ENV=sandbox`, and the two keys in `.env`.
 2. Restart the processes (`docker compose up --build` recreates containers when their environment changes). In the dashboard choose Connect institution, then Open Plaid Sandbox Link.
@@ -131,7 +133,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-The browser suite starts web and Go automatically; leave those ports free. It needs a prior web build and the app environment (APP_ORIGIN, COOKIE_SECURE, TOKEN_ENCRYPTION_KEY, SYNC_SERVICE_SECRET, SYNC_SERVICE_URL, PLAID_MODE and PLAID_ENV). Ensure Go is on PATH. Go tests skip integration cases when TEST_DATABASE_URL is absent and print the skip reason; that is not evidence of integration success. [GitHub Actions](.github/workflows/ci.yml) provisions PostgreSQL, runs these checks, audits runtime dependencies, and validates/builds Compose containers. Remote CI results remain unverified until the branch can be pushed.
+The browser suite starts web and Go automatically; leave those ports free. It needs a prior web build and the app environment (APP_ORIGIN, COOKIE_SECURE, TOKEN_ENCRYPTION_KEY, SYNC_SERVICE_SECRET, SYNC_SERVICE_URL, PLAID_MODE and PLAID_ENV). Ensure Go is on PATH. Go tests skip integration cases when TEST_DATABASE_URL is absent and print the skip reason; that is not evidence of integration success. [GitHub Actions](.github/workflows/ci.yml) provisions PostgreSQL, runs these checks, audits runtime dependencies, and validates/builds Compose containers. The feature branch and [draft PR #1](https://github.com/AryanSaini26/MyFinance/pull/1) are published; see docs/VERIFICATION.md for observed remote results.
 
 ## Disposable Docker integration tests
 
@@ -139,7 +141,7 @@ The browser suite starts web and Go automatically; leave those ports free. It ne
 npm run test:docker
 ```
 
-This uses `compose.test.yaml`, separate Node/Go test images and an ephemeral PostgreSQL database. It needs Docker with Compose v2; it does not load `.env`, publish database ports, mount the development volume or contact Plaid. The runner selects a unique project, runs Node and Go suites sequentially (both reset the test database), propagates failures and cleans up its test resources. Go is not permitted to silently skip integration tests in this stack. CI runs this command too. The runner has unit tests with Docker mocked; those do **not** establish that containers ran here. Actual Docker execution remains blocked in this environment.
+This uses `compose.test.yaml`, separate Node/Go test images and an ephemeral PostgreSQL database. It needs Docker with Compose v2; it does not load `.env`, publish database ports, mount the development volume or contact Plaid. The runner selects a unique project, runs Node and Go suites sequentially (both reset the test database), propagates failures and cleans up its test resources. Go is not permitted to silently skip integration tests in this stack. CI runs this command too. The runner has unit tests with Docker mocked; those do **not** establish that containers ran here. Actual Docker execution passed in GitHub Actions; it remains unavailable in the local coding sandbox.
 
 ## Optional live Sandbox backend smoke test
 

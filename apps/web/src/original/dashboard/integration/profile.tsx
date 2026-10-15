@@ -45,8 +45,8 @@ export default function Profile() {
       <Banner
         banner="/original/dashboard/banner.png"
         avatar={undefined}
-        name={w.user?.email}
-        job="MyFinance User"
+        name={w.user?.name ?? w.user?.email}
+        job={w.user?.name ? w.user.email : "MyFinance User"}
       />
       <Card>
         <Flex justify="space-between" align="center" mb="20px">

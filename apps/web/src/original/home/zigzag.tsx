@@ -17,10 +17,9 @@ export default function Zigzag() {
             </div>
             <h1 className="h2 mb-4">One idea, unlimited results</h1>
             <p className="text-xl text-gray-400">
-              This platform extracts data from your personal bank statements
-              utilizing various machine learning algorithms, and displays
-              statistics on a user-friendly dashboard, offering seamless
-              financial management.
+              Connect simulated accounts with Plaid Sandbox or import CSV
+              transactions. Explore spending, review explainable category
+              predictions, and track your monthly budgets.
             </p>
           </div>
 

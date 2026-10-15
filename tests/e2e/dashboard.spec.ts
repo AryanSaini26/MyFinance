@@ -81,6 +81,25 @@ test("original homepage, register, connect, sync twice, override, budget, import
       exact: true,
     }),
   ).toBeVisible();
+  // Navbar search from the overview opens the matching transaction results.
+  await page.getByRole("link", { name: "Pages", exact: true }).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await page
+    .getByRole("textbox", { name: "Search transactions", exact: true })
+    .fill("bus transit");
+  await page
+    .getByRole("button", { name: "Search transactions", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/dashboard\/transactions$/);
+  await expect(
+    page.getByRole("cell", { name: "bus transit", exact: false }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("cell", { name: "coffee cafe", exact: false }),
+  ).toHaveCount(0);
+  await page
+    .getByRole("textbox", { name: "Search transactions", exact: true })
+    .fill("");
   await page
     .getByLabel("Category filter", { exact: true })
     .selectOption("transport");

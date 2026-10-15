@@ -56,7 +56,8 @@ export default function Hero() {
               data-aos-delay="200"
             >
               Welcome to MyFinance, a data visualization tool to simplify
-              financial tracking, and guaranteed to save you time!
+              financial tracking with transaction analytics and category
+              budgets.
             </p>
             <div className="max-w-xs mx-auto sm:max-w-none sm:flex sm:justify-center">
               <div data-aos="fade-up" data-aos-delay="400">
@@ -72,6 +73,7 @@ export default function Hero() {
                   className="btn text-white bg-gray-700 hover:bg-gray-800 w-full sm:w-auto sm:ml-4"
                   href="https://github.com/AryanSaini26/MyFinance#readme"
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   Learn more
                 </a>

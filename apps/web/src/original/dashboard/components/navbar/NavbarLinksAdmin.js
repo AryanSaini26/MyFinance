@@ -1,5 +1,6 @@
 // Chakra Imports
 import React from "react";
+import NextLink from "next/link";
 
 import {
   Avatar,
@@ -21,11 +22,9 @@ import { FaEthereum } from "react-icons/fa";
 import routes from "@/original/dashboard/integration/routes";
 import { useWorkspace } from "@/original/dashboard/integration/context";
 
-import { useState, useEffect } from "react";
-
 export default function HeaderLinks(props) {
   const workspace = useWorkspace();
-  const username = workspace.user?.email;
+  const username = workspace.user?.name ?? workspace.user?.email;
   const handleLogoutClick = (event) => {
     event.preventDefault();
     workspace.logout();
@@ -135,7 +134,7 @@ export default function HeaderLinks(props) {
               borderRadius="8px"
               px="14px"
             >
-              <Link fontSize="sm" href="/dashboard/profile">
+              <Link as={NextLink} fontSize="sm" href="/dashboard/profile">
                 Profile Settings
               </Link>
             </MenuItem>

@@ -24,6 +24,7 @@ export default function Banner(props) {
       <Avatar
         mx="auto"
         src={avatar}
+        name={name}
         h="87px"
         w="87px"
         mt="-43px"

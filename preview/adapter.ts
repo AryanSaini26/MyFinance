@@ -70,7 +70,7 @@ type Budget = {
   amount: string;
 };
 type State = {
-  user: { email: string } | null;
+  user: { email: string; name?: string } | null;
   accounts: Account[];
   items: Item[];
   entries: Entry[];
@@ -95,7 +95,7 @@ function seed(): State {
     ["Internet utility", "-65.00", "utilities"],
   ];
   return {
-    user: { email: "demo@example.test" },
+    user: { email: "aryan@example.test", name: "Aryan Saini" },
     accounts: [
       {
         id: manual,
@@ -167,7 +167,11 @@ function seed(): State {
 function load(): State {
   try {
     const data = JSON.parse(sessionStorage.getItem(storageKey) ?? "null");
-    if (data?.accounts && data?.entries) return data;
+    if (data?.accounts && data?.entries) {
+      if (data.user?.email === "demo@example.test")
+        data.user = { email: "aryan@example.test", name: "Aryan Saini" };
+      return data;
+    }
   } catch {}
   return seed();
 }

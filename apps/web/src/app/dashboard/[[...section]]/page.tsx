@@ -1,2 +1,4 @@
-import DashboardEntry from "@/original/dashboard/integration/entry";
-export default DashboardEntry;
+// The shared layout owns workspace state across dashboard page navigation.
+export default function DashboardPage() {
+  return null;
+}

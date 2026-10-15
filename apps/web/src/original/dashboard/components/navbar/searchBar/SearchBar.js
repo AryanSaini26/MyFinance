@@ -1,4 +1,5 @@
 import React from "react";
+import { useRouter } from "next/navigation";
 import {
   IconButton,
   Input,
@@ -10,6 +11,7 @@ import { useWorkspace } from "@/original/dashboard/integration/context";
 import { SearchIcon } from "@chakra-ui/icons";
 export function SearchBar(props) {
   const workspace = useWorkspace();
+  const router = useRouter();
   // Pass the computed styles into the `__css` prop
   const { variant, background, children, placeholder, borderRadius, ...rest } =
     props;
@@ -18,10 +20,20 @@ export function SearchBar(props) {
   const inputBg = useColorModeValue("secondaryGray.300", "navy.900");
   const inputText = useColorModeValue("gray.700", "gray.100");
   return (
-    <InputGroup w={{ base: "100%", md: "200px" }} {...rest}>
+    <InputGroup
+      as="form"
+      role="search"
+      onSubmit={(event) => {
+        event.preventDefault();
+        router.push("/dashboard/transactions");
+      }}
+      w={{ base: "100%", md: "200px" }}
+      {...rest}
+    >
       <InputLeftElement
         children={
           <IconButton
+            type="submit"
             aria-label="Search transactions"
             bg="inherit"
             borderRadius="inherit"

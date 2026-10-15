@@ -7,14 +7,17 @@ export default function Footer() {
     <footer>
       <div className="py-12 md:py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          {/*
           {/* Top area: Blocks */}
           <div className="grid md:grid-cols-12 gap-8 lg:gap-20 mb-8 md:mb-12">
             {/* 1st block */}
             <div className="md:col-span-4 lg:col-span-5">
               <div className="mb-2">
                 {/* Logo */}
-                <Link href="/" className="inline-block" aria-label="Cruip">
+                <Link
+                  href="/"
+                  className="inline-block"
+                  aria-label="MyFinance home"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -59,9 +62,9 @@ export default function Footer() {
             <ul className="flex mb-4 md:order-1 md:ml-4 md:mb-0">
               <li className="ml-4">
                 <Link
-                  href="https://github.com/eatekha/MyFinance"
+                  href="https://github.com/AryanSaini26/MyFinance"
                   className="flex justify-center items-center text-purple-600 bg-gray-800 hover:text-gray-100 hover:bg-purple-600 rounded-full transition duration-150 ease-in-out"
-                  aria-label="Github"
+                  aria-label="Aryan Saini on GitHub"
                 >
                   <svg
                     className="w-8 h-8 fill-current"
@@ -74,9 +77,9 @@ export default function Footer() {
               </li>
               <li className="ml-4">
                 <Link
-                  href="https://www.linkedin.com/in/eseosa-atekha-86a137214/"
+                  href="https://www.linkedin.com/in/aryansaini26/"
                   className="flex justify-center items-center text-purple-600 bg-gray-800 hover:text-gray-100 hover:bg-purple-600 rounded-full transition duration-150 ease-in-out"
-                  aria-label="Linkedin"
+                  aria-label="Aryan Saini on LinkedIn"
                 >
                   <svg
                     className="w-8 h-8 fill-current"
@@ -91,7 +94,8 @@ export default function Footer() {
 
             {/* Copyrights note */}
             <div className="text-gray-400 text-sm mr-4">
-              &copy; Eseosa Atekha. All rights reserved.
+              &copy; {new Date().getFullYear()} Aryan Saini. All rights
+              reserved.
             </div>
           </div>
         </div>

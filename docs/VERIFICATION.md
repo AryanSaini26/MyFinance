@@ -84,3 +84,11 @@ The two original UI repositories were inspected and ported into the existing Nex
 The browser suite runs the original homepage/auth/dashboard screens against the real optimized Next.js build, Go and PostgreSQL. It covers register, Profile connect/repeated sync, Transactions overrides/manual entry/CSV/filtering, Budget, disconnect/logout, delayed next-user reads, and stale-filter-response isolation. New integration cases exercise six-month owner/currency analytics and literal search. Initial restored-screen browser runs exposed an inaccessible field label, navbar menu covered by cards, and a test navigation race. Explicit labels, sticky navbar stacking and a navigation-aware test helper resolved these before the three workflows passed.
 
 These local results supersede earlier test counts. The earlier successful remote Actions links above predate this original-UI integration; its new remote CI result is recorded after publication. Live Sandbox backend verification above remains applicable to the unchanged provider/sync backend. The hosted Link popup remains a manual check; static preview clicks cannot verify it.
+
+## Original-UI remote CI result
+
+[Run 38742186734](https://github.com/AryanSaini26/MyFinance/actions/runs/38742186734) completed successfully on original-UI integration commit 6d1622ea855b022700073bcbe833750a186f964d. Every step passed, including optimized build, three real-backend browser workflows, Docker application image builds, and disposable Docker integration tests. This supersedes the earlier pending-publication wording; the original UI is published on the feature branch and private synthetic preview.
+
+## Branding and navigation follow-up
+
+Updated Aryan Saini branding/social links, preview identity, metadata/favicon and homepage copy. The new overview-to-Transactions search regression initially exposed a workspace remount that cleared filters. Moving the dashboard into its shared Next.js layout fixed it. The subsequent optimized build, typecheck and all 3 browser workflows passed, including search navigation, delayed-next-user isolation and stale-filter protection. Formatting and whitespace checks passed. No backend schema, authentication, provider or sync algorithm changes were made in this follow-up.

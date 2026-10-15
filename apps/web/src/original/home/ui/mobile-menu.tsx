@@ -23,17 +23,17 @@ export default function MobileMenu() {
     };
     document.addEventListener("click", clickHandler);
     return () => document.removeEventListener("click", clickHandler);
-  });
+  }, [mobileNavOpen]);
 
   // close the mobile menu if the esc key is pressed
   useEffect(() => {
-    const keyHandler = ({ keyCode }: { keyCode: number }): void => {
-      if (!mobileNavOpen || keyCode !== 27) return;
+    const keyHandler = ({ key }: KeyboardEvent): void => {
+      if (!mobileNavOpen || key !== "Escape") return;
       setMobileNavOpen(false);
     };
     document.addEventListener("keydown", keyHandler);
     return () => document.removeEventListener("keydown", keyHandler);
-  });
+  }, [mobileNavOpen]);
 
   return (
     <div className="md:hidden">
@@ -60,6 +60,7 @@ export default function MobileMenu() {
       {/*Mobile navigation */}
       <nav
         id="mobile-nav"
+        inert={!mobileNavOpen}
         ref={mobileNav}
         className="absolute top-full z-20 left-0 w-full px-4 sm:px-6 overflow-hidden transition-all duration-300 ease-in-out"
         style={

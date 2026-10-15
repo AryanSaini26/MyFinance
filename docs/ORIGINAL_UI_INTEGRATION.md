@@ -7,7 +7,7 @@
 | [MyFinance-Homepage-main](https://github.com/AryanSaini26/MyFinance-Homepage-main) | a7afda3a3bd28a8d6e4f51ee6ac7ac157e1c558d | Dark purple homepage, logo, hero, illustrations, zigzag sections, typography, header/footer and authentication styling |
 | [MyFinance-User-nextjs-integration](https://github.com/AryanSaini26/MyFinance-User-nextjs-integration) | 3e0f69ae2951b50654f918a2a874653ab588b35f | Navy Chakra theme, sidebar/navbar, statistic cards, pie/line chart styling, calendar, transaction table/upload layout and profile banner |
 
-Both supplied repositories had only main in the remote branch inventory. Their original clones and upstream history are unchanged. Existing attribution remains in source/footer. No license grant is invented: the user-dashboard LICENSE file was empty. The main backend baseline is separately preserved under src/.
+Both supplied repositories had only main in the remote branch inventory. Their original clones and upstream history are unchanged. Original design provenance is recorded here and in Git history. Current application branding and social links display Aryan Saini, as requested by the repository owner. No license grant is invented: the user-dashboard LICENSE file was empty. The main backend baseline is separately preserved under src/.
 
 The first v2 dashboard was created before these repositories were supplied. It is retained as non-executable text in docs/reference and in Git history; the live root and dashboard now use the original designs. This records an integration step rather than rewriting past development claims.
 
@@ -29,3 +29,9 @@ No browser URL or sessionStorage value selects the application user. The server 
 Homepage image/video content was recaptured with synthetic records from the restored interface; original personal financial screenshots/recordings are not copied into this branch. The unchanged original upstream repositories remain separate. Unused stock assets were omitted.
 
 The private Site is an interactive **browser-only synthetic preview**, using the same design components but a separate adapter. Its footer/title disclose that boundary. The full Node/Go/PostgreSQL application runs with Docker Compose or the documented native setup. A static-hosting preview is not evidence of backend execution; backend, SQL, browser and real Sandbox results are separately recorded in VERIFICATION.md.
+
+## Branding and usability follow-up
+
+The homepage/dashboard footers now display Aryan Saini, and homepage social links target AryanSaini26/MyFinance and linkedin.com/in/aryansaini26/. The built-in browser-preview profile displays Aryan Saini; authenticated application profiles continue to show the signed-in account identity. Breadcrumbs use real routes, navbar search opens Transactions on Enter/button click, mobile navigation is inert while closed, and profile avatars show identity initials. Marketing text describes implemented Sandbox/CSV/budget behavior without an unverified time-saving guarantee. The original layout, colours and design are retained.
+
+The dashboard now renders from its shared Next.js layout so changing subpages preserves search, reporting month/currency and filters. An end-to-end regression navigates from the overview through navbar search and verifies only matching transaction rows remain. Logout leaves the layout and clears the workspace; the existing delayed-next-user and stale-filter regression tests remain in place.

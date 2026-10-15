@@ -72,7 +72,9 @@ const empty = {
 function useWorkspaceState() {
   const router = useRouter(),
     version = useRef(0);
-  const [user, setUser] = useState<{ email: string } | null>(null),
+  const [user, setUser] = useState<{ email: string; name?: string } | null>(
+      null,
+    ),
     [ready, setReady] = useState(false),
     [mode, setMode] = useState("mock"),
     [data, setData] = useState(empty);
@@ -87,7 +89,7 @@ function useWorkspaceState() {
     [notice, setNotice] = useState("");
   useEffect(() => {
     let active = true;
-    api<{ user: { email: string }; mode: string }>("auth/me")
+    api<{ user: { email: string; name?: string }; mode: string }>("auth/me")
       .then((v) => {
         if (active) {
           setUser(v.user);

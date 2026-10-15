@@ -12,7 +12,7 @@ A **frontend** displays information and accepts input. A **backend** checks that
 
 | Piece                    | Actual purpose                                                        | Start reading here                                        |
 | ------------------------ | --------------------------------------------------------------------- | --------------------------------------------------------- |
-| Next.js/React/TypeScript | Browser dashboard plus same-origin Node route handlers                | `apps/web/src/app/page.tsx`, `app/api/[...path]/route.ts` |
+| Next.js/React/TypeScript | Browser dashboard plus same-origin Node route handlers                | `apps/web/src/original/dashboard/integration/`, `app/api/[...path]/route.ts` |
 | Central API boundary     | Origin checks, session lookup, handler selection and safe errors      | `apps/web/src/lib/api.ts`                                 |
 | Domain handlers          | Accounts, authentication, transactions, connections and reporting     | `apps/web/src/lib/routes/`                                |
 | PostgreSQL               | Users, ownership, numeric money, constraints and atomic commits       | `database/migrations/001_initial.sql`                     |
@@ -239,3 +239,7 @@ The browser suite exercises the built app, real Node-to-Go HTTP, both services' 
 ## 11. Suggested learning order
 
 Run mock mode and make one purchase. Trace its route and SQL with this guide. Change a category and inspect prediction versus override. Import the same CSV twice. Read the Go pagination test before the implementation, then run the rollback and concurrency integration tests. Explain aloud why the cursor must not move after a failed database write. Finally practice the questions without reading the answers. Understanding those boundaries matters more than memorizing the technology names.
+
+## Original frontend integration
+
+The homepage and dashboard designs come from the two related original repositories documented in ORIGINAL_UI_INTEGRATION.md. The homepage remains dark purple; Dashboard, Transactions, Budget and Profile retain the navy Chakra layout. Presentation components retain JavaScript/JSX where practical; new typed integration code connects them to same-origin authenticated APIs. The Budget placeholder now has real category targets. Analytics uses six calendar-month buckets from PostgreSQL, while navbar search applies a literal owner-scoped description filter. This separates the original visual design from the newly implemented backend and integration work.

@@ -10,10 +10,10 @@ This describes the implemented system. Follow it with a concrete example rather 
 
 ## Five-minute demonstration
 
-1. In the private browser demo, inspect the sample CAD income/expense summary, spending categories and budgets. The banner identifies the browser-only adapter.
-2. Add a manual expense, such as “coffee cafe” for -6.25 in today's month. The shared Naive Bayes model predicts its category.
-3. Override its category to Shopping. Filter the table to Shopping and save a Shopping budget. Spending follows the effective category.
-4. Connect a simulated institution and choose Sync twice. The second call does not insert duplicate demo records. The real implementation enforces that behavior using database unique constraints and persisted cursors; the preview simulates it locally.
+1. In the private browser demo, choose Demo App on the original homepage, then inspect the sample CAD income/expense summary and spending categories. The footer identifies the browser-only adapter.
+2. Open Transactions and add a manual expense, such as “coffee cafe” for -6.25 in today's month. The shared Naive Bayes model predicts its category.
+3. Override its category to Shopping. Filter the table to Shopping and open Budget to save a Shopping budget. Spending follows the effective category.
+4. Open Profile, connect a simulated institution and choose Sync twice. The second call does not insert duplicate demo records. The real implementation enforces that behavior using database unique constraints and persisted cursors; the preview simulates it locally.
 5. Show the Go synchronization tests in the repository. Explain the test that deliberately fails the final cursor write and asserts that earlier transaction writes rolled back. This is stronger evidence of recoverability than clicking Sync twice.
 
 ## Trace a manual expense
@@ -72,3 +72,7 @@ Holding the lock across network calls makes this design simple but ties up a dat
 - What does the synthetic classifier evaluation establish, and what does it leave unknown?
 
 Use INTERVIEW_DEEP_DIVE.md for the longer answers and glossary. You should be able to explain the manual-request and sync-failure paths without memorizing source line numbers.
+
+## Frontend provenance and modernization
+
+The original application spans three repositories: the Express/CSV backend, a dark purple Next.js homepage, and a navy Chakra dashboard. The later two repositories were provided after the first v2 dashboard was built. Their original branding, page structure, theme and component design now drive the v2 frontend. The first v2 design is retained only as historical reference. New work connects these screens to authenticated APIs, fills the original Budget placeholder, and replaces unsafe user-ID URLs, client session markers and hardcoded totals. Consult ORIGINAL_UI_INTEGRATION.md for exact upstream commit IDs and changes. This is modernization and integration of an existing design, not an assertion that those original templates were newly designed here.

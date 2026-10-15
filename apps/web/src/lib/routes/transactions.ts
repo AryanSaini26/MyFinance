@@ -2,7 +2,7 @@ import { z } from "zod";
 import { db, transaction } from "../db";
 import { ApiError, assertFound } from "../errors";
 
-import { category, date, entry, uuid } from "../validation";
+import { category, currency, date, entry, uuid } from "../validation";
 
 import { classify } from "../classification";
 import { importKey, parseCsv } from "../imports";
@@ -16,6 +16,8 @@ export async function transactions(req: Request, path: string[], user: string) {
       .object({
         accountId: uuid.optional(),
         categoryId: category.optional(),
+        currency: currency.optional(),
+        search: z.string().max(100).optional(),
         from: date.optional(),
         to: date.optional(),
         limit: z.coerce.number().int().min(1).max(100).default(50),
@@ -27,6 +29,7 @@ export async function transactions(req: Request, path: string[], user: string) {
     const conditions = ["t.user_id=$1", "t.removed_at IS NULL"];
     for (const [v, column] of [
       [filter.accountId, "t.account_id"],
+      [filter.currency, "t.currency"],
       [
         filter.categoryId,
         "COALESCE(t.category_override_id,t.predicted_category_id)",
@@ -42,6 +45,12 @@ export async function transactions(req: Request, path: string[], user: string) {
             ` $${values.length}`,
         );
       }
+    if (filter.search) {
+      values.push(filter.search);
+      conditions.push(
+        `strpos(lower(t.description), lower($${values.length})) > 0`,
+      );
+    }
     values.push(filter.limit, filter.offset);
     return ok(
       (

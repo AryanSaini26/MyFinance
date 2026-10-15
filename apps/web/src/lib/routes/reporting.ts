@@ -9,6 +9,31 @@ export async function reporting(req: Request, path: string[], user: string) {
   const method = req.method,
     route = path.join("/"),
     url = new URL(req.url);
+  if (route === "analytics" && method === "GET") {
+    const month = calendarMonth.parse(
+      url.searchParams.get("month") ?? new Date().toISOString().slice(0, 7),
+    );
+    const selectedCurrency = currency.parse(
+      url.searchParams.get("currency") ?? "CAD",
+    );
+    const months = await db().query(
+      `WITH months AS (SELECT generate_series($2::date-interval '5 months',$2::date,interval '1 month')::date AS month)
+       SELECT to_char(m.month,'YYYY-MM') AS month,
+       COALESCE(sum(t.amount) FILTER(WHERE t.amount>0),0)::text AS income,
+       COALESCE(-sum(t.amount) FILTER(WHERE t.amount<0),0)::text AS expenses,
+       count(t.id)::int AS count FROM months m LEFT JOIN transactions t
+       ON t.user_id=$1 AND t.currency=$3 AND t.removed_at IS NULL AND NOT t.pending
+       AND COALESCE(t.category_override_id,t.predicted_category_id)<>'transfer'
+       AND t.date>=m.month AND t.date<m.month+interval '1 month'
+       GROUP BY m.month ORDER BY m.month`,
+      [user, month + "-01", selectedCurrency],
+    );
+    const total = await db().query(
+      "SELECT count(*)::int AS n FROM transactions WHERE user_id=$1 AND currency=$2 AND removed_at IS NULL",
+      [user, selectedCurrency],
+    );
+    return ok({ months: months.rows, allTimeCount: total.rows[0].n });
+  }
   if (route === "summary" && method === "GET") {
     const month = calendarMonth.parse(
       url.searchParams.get("month") ?? new Date().toISOString().slice(0, 7),

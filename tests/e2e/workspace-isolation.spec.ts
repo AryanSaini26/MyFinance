@@ -2,19 +2,22 @@ import { test, expect, type Page } from "@playwright/test";
 const origin = "http://localhost:3000";
 async function register(page: Page) {
   await page
-    .getByRole("button", { name: "New here? Create an account" })
+    .getByRole("banner")
+    .getByRole("link", { name: "Sign up", exact: true })
     .click();
+  await expect(page).toHaveURL(/\/signup$/);
+  await expect(
+    page.getByText("Or, register with your email", { exact: true }),
+  ).toBeVisible();
   await page
     .getByLabel("Email", { exact: true })
     .fill(`isolation-${crypto.randomUUID()}@example.test`);
   await page
     .getByLabel("Password", { exact: true })
     .fill("a strong browser password");
-  await page
-    .getByRole("button", { name: "Create account", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Sign up", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Make sense of your spending." }),
+    page.getByText("Overall Transactions", { exact: true }),
   ).toBeVisible();
 }
 async function add(page: Page, description: string, categoryId: string) {
@@ -34,23 +37,24 @@ async function add(page: Page, description: string, categoryId: string) {
 test("logout clears cached financial data before another user's slow initial load", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/signin");
   await register(page);
   await add(page, "private first-user entry", "dining");
-  await page.reload();
+  await page.goto("/dashboard/transactions");
   await expect(
     page.getByRole("cell", { name: "private first-user entry", exact: false }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  await page.getByRole("button", { name: "User menu", exact: true }).click();
+  await page.getByRole("link", { name: "Log Out", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Welcome back" }),
+    page.getByRole("button", { name: "Sign in", exact: true }),
   ).toBeVisible();
   let release!: () => void;
   const held = new Promise<void>((resolve) => {
     release = resolve;
   });
   await page.route(
-    /\/api\/(accounts|categories|transactions|items|budgets|summary)(\?|$)/,
+    /\/api\/(accounts|categories|transactions|items|budgets|summary|analytics)(\?|$)/,
     async (route) => {
       await held;
       await route.continue();
@@ -58,6 +62,7 @@ test("logout clears cached financial data before another user's slow initial loa
   );
   try {
     await register(page);
+    await page.getByRole("link", { name: "Transactions", exact: true }).click();
     await expect(
       page.getByRole("cell", {
         name: "private first-user entry",
@@ -74,11 +79,11 @@ test("logout clears cached financial data before another user's slow initial loa
 test("an older filter response cannot overwrite the currently selected category", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/signin");
   await register(page);
   await add(page, "slow dining entry", "dining");
   await add(page, "latest groceries entry", "groceries");
-  await page.reload();
+  await page.goto("/dashboard/transactions");
   await expect(
     page.getByRole("cell", { name: "slow dining entry", exact: false }),
   ).toBeVisible();
@@ -104,7 +109,7 @@ test("an older filter response cannot overwrite the currently selected category"
   );
   const filter = page
     .locator(".filters")
-    .getByRole("combobox", { name: "Category", exact: true });
+    .getByRole("combobox", { name: "Category filter", exact: true });
   try {
     await filter.selectOption("dining");
     await received;

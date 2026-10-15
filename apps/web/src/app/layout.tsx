@@ -1,4 +1,5 @@
 import "./globals.css";
+import "@/original/fonts";
 export const metadata = {
   title: "MyFinance v2 · Sandbox",
   description:

@@ -2,7 +2,7 @@
 
 ## Processes and trust boundaries
 
-The browser renders `apps/web/src/app/page.tsx`. Next.js serves the page and the same-origin `/api/*` backend. The single route entry point delegates to domain handlers in `src/lib/routes/`; `src/lib/api.ts` provides the authentication/error boundary. PostgreSQL stores relational state. The internal Go server accepts authenticated sync requests and talks to Plaid Sandbox. No message broker, cache cluster, service mesh or public deployment is required.
+The browser renders the original homepage at `/`, authentication at `/signin` and `/signup`, and the original dashboard shell at `/dashboard` with Transactions, Budget and Profile subroutes. Source design components live in `apps/web/src/original`; typed integration/context code calls the authenticated API and invalidates stale responses. The retained dashboard template uses JavaScript/JSX while new integration code uses TypeScript. Next.js serves these pages and the same-origin `/api/*` backend. The single route entry point delegates to domain handlers in `src/lib/routes/`; `src/lib/api.ts` provides the authentication/error boundary. PostgreSQL stores relational state. The internal Go server accepts authenticated sync requests and talks to Plaid Sandbox. No message broker, cache cluster, service mesh or public deployment is required.
 
 ```mermaid
 flowchart TD
@@ -80,3 +80,7 @@ Manual and CSV insertions run inference in Node. Provider additions/modification
 ## Operational scope
 
 No scheduler/webhook or automatic sync on connection is implemented. Manual Sync invokes the real incremental path and safely handles initial empty results. Current balances are metadata; no on-demand balance endpoint or available-funds claim exists. Shared database credentials simplify local development but are not a production least-privilege role design. See security/verification documents before describing the project as production-ready.
+
+## Analytics and restored dashboard
+
+`GET /api/analytics?month=YYYY-MM&currency=CAD|USD` generates six calendar months and left joins posted, nonremoved, nontransfer owner transactions, producing zero-valued empty months. Income and expenses follow the same sign/currency rules as summaries. Overall count includes nonremoved transactions in the selected currency. The transaction list additionally supports a literal, case-insensitive description search and currency filter; SQL parameters and owner predicates apply to both. Charts render real query results, not original hardcoded growth percentages. See ORIGINAL_UI_INTEGRATION.md for source provenance and retained design boundaries.

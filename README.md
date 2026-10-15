@@ -2,11 +2,11 @@
 
 A working personal finance learning application: Next.js/TypeScript frontend and API, PostgreSQL, a Go transaction synchronization service, and explainable Naive Bayes categorization. Bank connections use a local simulator by default or **Plaid Sandbox only**. No real money moves.
 
-This v2 implementation modernizes the original Express/CSV application at baseline `92f23aa`. Legacy source is retained under `src/` for historical review; its unsafe server entry point is disabled. The original checkout did not contain a complete runnable frontend, migrations, sessions, Plaid, or Go infrastructure. See [the audit](docs/AUDIT.md). No performance or real-world model-accuracy claims are made.
+This v2 implementation modernizes the original Express/CSV application at baseline `92f23aa`. Legacy source is retained under `src/` for historical review; its unsafe server entry point is disabled. The main backend checkout did not contain a complete runnable frontend, migrations, sessions, Plaid, or Go infrastructure. The related original homepage and dashboard repositories were subsequently supplied and their designs are now integrated into this Next.js application; see [original UI provenance and integration](docs/ORIGINAL_UI_INTEGRATION.md). See [the audit](docs/AUDIT.md). No performance or real-world model-accuracy claims are made.
 
 ## View the interactive demo
 
-[Open the private dashboard demo](https://myfinance-aryan-demo.calmluck3.chatgpt.site). It uses the same dashboard component with synthetic browser-local data; it does **not** host the Node/Go/PostgreSQL backend. The banner explains the boundary. Use sample data only. Add expenses, change categories, filter, save budgets and repeat simulated sync; Reset sample data restores the examples.
+[Open the private original-design preview](https://myfinance-aryan-demo.calmluck3.chatgpt.site). It reuses the original homepage, authentication styling and navy dashboard components with synthetic browser-local data; it does **not** host the Node/Go/PostgreSQL backend. The preview footer identifies this boundary. Choose **Demo App**, then explore Dashboard, Transactions, Budget and Profile. Use sample data only. Clear this site's tab/session storage to reset examples.
 
 `npm run preview:build` builds this separate demo into `preview/dist`. See [preview details](preview/README.md), [the follow-up audit](docs/FOLLOW_UP_AUDIT.md), and [the project interview walkthrough](docs/ROBINHOOD_PROJECT_PREP.md).
 
@@ -19,7 +19,7 @@ npm run env:init
 docker compose up --build
 ```
 
-Open http://localhost:3000, choose **Create an account**, and use a password of 12–128 characters. Choose **Connect institution**, then **Sync**. Mock mode creates a synthetic checking account and two current-month transactions. Repeating Sync does not duplicate them. Add a manual transaction or import a CSV into the automatically created Cash / CSV account. Override a category in the transaction table, then create a budget in that category.
+Open http://localhost:3000, choose **Sign up**, and use a password of 12–128 characters. Open **Profile**, choose **Connect institution**, then **Sync**. Mock mode creates a synthetic checking account and two current-month transactions. Repeating Sync does not duplicate them. Open **Transactions** to add a manual transaction or import CSV into the automatically created Cash / CSV account. Override a category in the table, then open **Budget** to track spending in that category. Use the user menu to log out.
 
 `env:init` creates an ignored `.env` with independent random database, token-encryption and internal-service secrets; it refuses to overwrite an existing file. `.env.example` contains placeholders. Keep `.env` private. Compose starts PostgreSQL, runs migrations, then starts web and sync. The database and web ports bind only to localhost; sync has no published port. `docker compose down` retains the database volume.
 
@@ -72,7 +72,7 @@ The web app is on port 3000 and the internal sync service on 8080. Manual sync r
 New to Plaid? Follow [the free Sandbox account/key guide](docs/PLAID_SANDBOX_SETUP.md).
 
 1. Obtain developer Sandbox keys from [Plaid's dashboard](https://dashboard.plaid.com/). Set `PLAID_MODE=sandbox`, `PLAID_ENV=sandbox`, and the two keys in `.env`.
-2. Restart the processes (`docker compose up --build` recreates containers when their environment changes). In the dashboard choose Connect institution, then Open Plaid Sandbox Link.
+2. Restart the processes (`docker compose up --build` recreates containers when their environment changes). In Profile choose Connect institution, then Open Plaid Sandbox Link.
 3. Select a supported non-OAuth test institution, such as First Platypus Bank. Use Plaid's test credentials, not real bank credentials. The standard Sandbox example is `user_good` / `pass_good`; dynamic transaction testing is described in the official docs below.
 4. After Link completes, the backend exchanges the public token, fetches metadata, encrypts the access token and stores the Item and accounts atomically. Choose Sync; if the initial response is empty, wait and retry after Sandbox data becomes ready.
 5. Disconnect revokes the Sandbox Item and clears its stored token. Historical transactions remain visible; linked accounts become inactive.
@@ -82,7 +82,8 @@ Do not switch modes with active Items from the other mode: disconnect them in th
 ## Repository structure
 
 ```text
-apps/web/src/app/          Next.js dashboard and API route entry point
+apps/web/src/app/          Next.js homepage, auth, dashboard routes and API entry point
+apps/web/src/original/     Preserved homepage/dashboard design and typed API integration
 apps/web/src/lib/routes/   Authentication, accounts, connections, transactions, reporting
 apps/web/src/lib/          Sessions, encryption, database pool, validation, Plaid adapter
 services/sync/cmd/sync/    Internal HTTP server

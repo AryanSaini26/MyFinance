@@ -337,3 +337,86 @@ it("rate limits repeated authentication attempts", async () => {
     ).status,
   ).toBe(429);
 });
+it("returns six owner-scoped monthly chart buckets without mixing currencies or transfers", async () => {
+  for (const [description, amount, date, categoryId] of [
+    ["salary", "100", "2026-01-02", "income"],
+    ["coffee cafe", "-25", "2026-01-03", "dining"],
+    ["transfer", "-80", "2026-01-04", "transfer"],
+  ])
+    expect(
+      (
+        await request("transactions", "POST", {
+          accountId: accountA,
+          description,
+          amount,
+          date,
+          categoryId,
+        })
+      ).status,
+    ).toBe(201);
+  const usd = (
+    await (
+      await request("accounts", "POST", { name: "USD Cash", currency: "USD" })
+    ).json()
+  ).id;
+  await request("transactions", "POST", {
+    accountId: usd,
+    description: "coffee usd",
+    amount: "-90",
+    date: "2026-01-05",
+  });
+  const analytics = await (
+    await request("analytics?month=2026-01&currency=CAD")
+  ).json();
+  expect(analytics.months).toHaveLength(6);
+  expect(analytics.months[0]).toMatchObject({
+    month: "2025-08",
+    income: "0",
+    expenses: "0",
+    count: 0,
+  });
+  expect(analytics.months[5]).toMatchObject({
+    month: "2026-01",
+    income: "100.00",
+    expenses: "25.00",
+    count: 2,
+  });
+  expect(analytics.allTimeCount).toBe(3);
+  const other = await (
+    await request(
+      "analytics?month=2026-01&currency=CAD",
+      "GET",
+      undefined,
+      cookieB,
+    )
+  ).json();
+  expect(other.allTimeCount).toBe(0);
+  expect(other.months.every((m: { count: number }) => m.count === 0)).toBe(
+    true,
+  );
+  expect((await request("analytics?month=0000-01")).status).toBe(400);
+  expect((await request("analytics?currency=EUR")).status).toBe(400);
+});
+it("searches descriptions literally with currency and ownership filters", async () => {
+  await request("transactions", "POST", {
+    accountId: accountA,
+    description: "Coffee_100% cafe",
+    amount: "-4.25",
+    date: "2026-01-02",
+  });
+  const result = await (
+    await request("transactions?search=COFFEE_100%25&currency=CAD")
+  ).json();
+  expect(result).toHaveLength(1);
+  expect(
+    await (await request("transactions?search=COFFEE&currency=USD")).json(),
+  ).toEqual([]);
+  expect(
+    await (
+      await request("transactions?search=coffee", "GET", undefined, cookieB)
+    ).json(),
+  ).toEqual([]);
+  expect((await request("transactions?search=" + "x".repeat(101))).status).toBe(
+    400,
+  );
+});

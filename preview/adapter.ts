@@ -391,6 +391,28 @@ function run(url: URL, method: string, body: any): unknown {
     row.category_override_id = body.categoryId;
     return { ok: true };
   }
+  if (path === "analytics") {
+    const selected = url.searchParams.get("month") ?? month(),
+      code = url.searchParams.get("currency") ?? "CAD";
+    calendarMonth.parse(selected);
+    currency.parse(code);
+    const months = Array.from({ length: 6 }, (_, index) => {
+      const d = new Date(selected + "-01T00:00:00Z");
+      d.setUTCMonth(d.getUTCMonth() - 5 + index);
+      const key = d.toISOString().slice(0, 7),
+        value = summary(key).totals.find((t) => t.currency === code);
+      return {
+        month: key,
+        income: value?.income ?? "0",
+        expenses: value?.expenses ?? "0",
+        count: value?.count ?? 0,
+      };
+    });
+    return {
+      months,
+      allTimeCount: state.entries.filter((t) => t.currency === code).length,
+    };
+  }
   if (path === "summary")
     return summary(url.searchParams.get("month") ?? month());
   if (path === "budgets" && method === "GET")

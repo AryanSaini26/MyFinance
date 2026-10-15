@@ -21,6 +21,7 @@ Every POST/PATCH/DELETE needs `Origin: http://localhost:3000` (matching APP_ORIG
 | POST /api/plaid/exchange | `{publicToken}`; stores encrypted Item/metadata; returns `{id}`. |
 | POST /api/items/:id/sync | Authenticates the user, forwards owned active Item to internal Go service; returns event counts. |
 | DELETE /api/items/:id | Durable disconnect intent, provider removal, local token erasure/account deactivation. |
+| GET /api/analytics | `month=YYYY-MM&currency=CAD|USD`; six monthly income/expense buckets and overall transaction count, owner scoped. |
 | GET /api/transactions | Filters: accountId, categoryId, from, to, limit (1–100, default 50), offset (0–100000). Stable date/ID descending order. |
 | POST /api/transactions | Manual accountId, description, signed amount, ISO date; optional categoryId and idempotencyKey. 201 `{id}` or duplicate 409. |
 | PATCH /api/transactions/:id | `{categoryId:"shopping"}` sets override; `{categoryId:null}` restores prediction. |
@@ -103,3 +104,5 @@ Create Alice and Bob in two browser profiles or separate cookie jars. Record Ali
 ## Internal Go API
 
 `GET /health` verifies its database connection. `POST /sync` requires `Authorization: Bearer <SYNC_SERVICE_SECRET>` and `{"item_id":"UUID","user_id":"UUID"}`. Only Next.js calls it in normal use. It has 4 KiB request bodies and a 90-second sync context. It returns counts of provider events processed, or safe generic HTTP failures. End users must call the Node `/api/items/:id/sync` route so session ownership is enforced before forwarding. Never expose the service secret in browser code.
+
+Transaction retrieval accepts `currency=CAD|USD` and `search` (at most 100 characters) alongside its existing filters. Search is a literal case-insensitive description substring, so `%` and `_` do not become SQL wildcards. All filters remain owner scoped and parameterized. The original dashboard uses this endpoint through its navbar search and Transactions controls.

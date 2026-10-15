@@ -25,3 +25,7 @@ Prior commits still contain the original samples. This branch does not erase the
 ## Remaining boundaries
 
 This is a local Sandbox/learning application. It has no password reset, email verification, MFA, distributed abuse protection, authenticated Plaid webhook receiver, background scheduler, account deletion, formal penetration test, or production operational runbook. Per-email throttling is not comprehensive DoS prevention. Logout revokes the current session only. These are explicit limits, not claimed implementations. See [SECURITY.md](SECURITY.md).
+
+## Related frontend repositories supplied later
+
+The initial audit above was scoped to the main backend checkout. The subsequently supplied MyFinance-Homepage-main and MyFinance-User-nextjs-integration repositories contained the original homepage and dashboard design; those are now integrated, replacing the first v2 dashboard. The user dashboard was a CRA/React 17 application despite its repository name. Audit findings included hardcoded remote endpoints, user IDs in URLs/browser state, password logging on authentication failure, placeholder budgeting, and hardcoded chart/comparison values. The v2 integration removes these runtime paths, uses session-derived ownership and actual reporting queries, and preserves the original design. Exact upstream revisions and changes are in ORIGINAL_UI_INTEGRATION.md.

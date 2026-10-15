@@ -23,3 +23,9 @@ The live Plaid Sandbox backend smoke passed. The hosted Link popup remains a sep
 The follow-up adds a dedicated disposable Docker integration stack (Node and Go tests against ephemeral PostgreSQL), cleanup/failure-propagation tests, a CI container-test step, and an opt-in real Sandbox backend smoke command. Actual Docker execution subsequently passed remotely. Live Sandbox execution subsequently passed using transient developer keys; no keys are committed or required by normal CI.
 
 GitHub authorization is resolved and PR #1 is open. Full remote CI, including real Docker integration suites, passed on published code commit fde4942844eb10b2324e31911a8031a8088e44cb (run 38665315899). The full job also passed on 8c4b1dd (run 38665793668). Real Sandbox backend verification passed on that same source; configuration is documented in PLAID_SANDBOX_SETUP.md.
+
+## Follow-up audit and private demo
+
+Fixed cached financial data persisting across logout, stale filter responses, empty category overrides and PostgreSQL-incompatible year-zero inputs. Plaid SDK failures now return a safe 502 without provider payloads. Added API/browser regressions; follow-up execution passed 20 unit tests, 11 PostgreSQL handler tests, 18 Go tests with race detection and 3 browser workflows, plus build/typecheck/format/audit.
+
+A separate browser-only demo reuses the actual dashboard component and synthetic local API adapter. It does not host the production backend or include credentials. docs/FOLLOW_UP_AUDIT.md records findings and docs/ROBINHOOD_PROJECT_PREP.md provides a practical request/sync/failure walkthrough.

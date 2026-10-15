@@ -195,6 +195,37 @@ it("imports CSV atomically, detects replay and rejects conflicts", async () => {
     (await request("imports/csv", "POST", { accountId: accountB, csv })).status,
   ).toBe(404);
 });
+it("rejects year zero and empty overrides before SQL and preserves existing data", async () => {
+  const data = {
+    accountId: accountA,
+    description: "coffee cafe",
+    amount: "-4.25",
+    date: "2026-01-02",
+  };
+  const created = await request("transactions", "POST", data);
+  const id = (await created.json()).id;
+  expect(
+    (await request("transactions/" + id, "PATCH", { categoryId: "" })).status,
+  ).toBe(400);
+  expect(
+    (await request("transactions", "POST", { ...data, date: "0000-01-01" }))
+      .status,
+  ).toBe(400);
+  expect((await request("summary?month=0000-01")).status).toBe(400);
+  expect(
+    (
+      await request("budgets", "POST", {
+        categoryId: "dining",
+        month: "0000-01",
+        currency: "CAD",
+        amount: "50",
+      })
+    ).status,
+  ).toBe(400);
+  const rows = await (await request("transactions")).json();
+  expect(rows).toHaveLength(1);
+  expect(rows[0].category_id).toBe("dining");
+});
 it("rolls back database writes when a later statement fails", async () => {
   await expect(
     transaction(async (c) => {

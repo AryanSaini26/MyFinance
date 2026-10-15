@@ -76,3 +76,15 @@ it("rejects production mode and missing credentials before network calls", async
   await expect(exchange("public")).rejects.toThrow();
   expect(sdk.exchange).not.toHaveBeenCalled();
 });
+it("returns a safe upstream error without SDK credentials or token payloads", async () => {
+  sdk.link.mockRejectedValueOnce({
+    isAxiosError: true,
+    message: "private-token-and-secret",
+    config: { headers: { "PLAID-SECRET": "private-token-and-secret" } },
+  });
+  await expect(linkToken("u")).rejects.toMatchObject({
+    status: 502,
+    code: "PLAID_REQUEST_FAILED",
+    message: "Plaid Sandbox request failed; check configuration and retry",
+  });
+});

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { db, transaction } from "../db";
 import { ApiError, assertFound } from "../errors";
 
-import { date, entry, uuid } from "../validation";
+import { category, date, entry, uuid } from "../validation";
 
 import { classify } from "../classification";
 import { importKey, parseCsv } from "../imports";
@@ -15,7 +15,7 @@ export async function transactions(req: Request, path: string[], user: string) {
     const filter = z
       .object({
         accountId: uuid.optional(),
-        categoryId: z.string().max(40).optional(),
+        categoryId: category.optional(),
         from: date.optional(),
         to: date.optional(),
         limit: z.coerce.number().int().min(1).max(100).default(50),
@@ -85,7 +85,7 @@ export async function transactions(req: Request, path: string[], user: string) {
   if (path[0] === "transactions" && path.length === 2 && method === "PATCH") {
     const id = uuid.parse(path[1]);
     const body = z
-      .object({ categoryId: z.string().max(40).nullable() })
+      .object({ categoryId: category.nullable() })
       .strict()
       .parse(await json(req));
     if (body.categoryId) await validCategory(body.categoryId);

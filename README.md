@@ -4,6 +4,12 @@ A working personal finance learning application: Next.js/TypeScript frontend and
 
 This v2 implementation modernizes the original Express/CSV application at baseline `92f23aa`. Legacy source is retained under `src/` for historical review; its unsafe server entry point is disabled. The original checkout did not contain a complete runnable frontend, migrations, sessions, Plaid, or Go infrastructure. See [the audit](docs/AUDIT.md). No performance or real-world model-accuracy claims are made.
 
+## View the interactive demo
+
+[Open the private dashboard demo](https://myfinance-aryan-demo.calmluck3.chatgpt.site). It uses the same dashboard component with synthetic browser-local data; it does **not** host the Node/Go/PostgreSQL backend. The banner explains the boundary. Use sample data only. Add expenses, change categories, filter, save budgets and repeat simulated sync; Reset sample data restores the examples.
+
+`npm run preview:build` builds this separate demo into `preview/dist`. See [preview details](preview/README.md), [the follow-up audit](docs/FOLLOW_UP_AUDIT.md), and [the project interview walkthrough](docs/ROBINHOOD_PROJECT_PREP.md).
+
 ## Run locally with Docker Compose
 
 Requirements: Node.js 24 (to generate local configuration), Docker Engine/Desktop with Compose v2. No paid services or Plaid credentials are required in mock mode.

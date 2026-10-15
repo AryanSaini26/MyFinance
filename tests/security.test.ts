@@ -8,7 +8,13 @@ import {
 } from "../apps/web/src/lib/security";
 import { checkOrigin, sessionCookie } from "../apps/web/src/lib/auth";
 import { parseCsv, importKey } from "../apps/web/src/lib/imports";
-import { credentials, entry, date } from "../apps/web/src/lib/validation";
+import {
+  calendarMonth,
+  category,
+  credentials,
+  entry,
+  date,
+} from "../apps/web/src/lib/validation";
 describe("security primitives", () => {
   beforeEach(() => {
     process.env.TOKEN_ENCRYPTION_KEY = "ab".repeat(32);
@@ -64,6 +70,11 @@ describe("security primitives", () => {
       credentials.safeParse({ email: "a@b.com", password: "short" }).success,
     ).toBe(false);
     expect(date.safeParse("2026-02-30").success).toBe(false);
+    expect(date.safeParse("0000-01-01").success).toBe(false);
+    expect(calendarMonth.safeParse("0000-01").success).toBe(false);
+    expect(calendarMonth.safeParse("2026-13").success).toBe(false);
+    expect(calendarMonth.safeParse("0001-01").success).toBe(true);
+    expect(category.safeParse("").success).toBe(false);
     expect(
       entry.safeParse({
         accountId: "f11c6e2a-5a01-419a-b111-111111111111",

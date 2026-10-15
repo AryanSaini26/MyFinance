@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { usePlaidLink } from "react-plaid-link";
 type Account = {
   type: string;
@@ -107,7 +107,9 @@ export default function Page() {
     [offset, setOffset] = useState(0),
     [link, setLink] = useState("");
   const [entryKey, setEntryKey] = useState("");
+  const refreshVersion = useRef(0);
   const refresh = useCallback(async () => {
+    const version = ++refreshVersion.current;
     const query = new URLSearchParams({
       from: month + "-01",
       to: new Date(
@@ -128,6 +130,8 @@ export default function Page() {
       api<Budget[]>("budgets"),
       api<Summary>("summary?month=" + month),
     ]);
+    // An older request must not replace a newer filter or signed-in workspace.
+    if (version !== refreshVersion.current) return;
     setAccounts(a);
     setCategories(c);
     setEntries(t);
@@ -146,7 +150,12 @@ export default function Page() {
     setEntryKey(crypto.randomUUID());
   }, []);
   useEffect(() => {
-    if (user) refresh().catch((e) => setError(e.message));
+    let cancelled = false;
+    if (user) refresh().catch((e) => !cancelled && setError(e.message));
+    return () => {
+      cancelled = true;
+      refreshVersion.current++;
+    };
   }, [user, refresh]);
   async function action(fn: () => Promise<void>) {
     setError("");
@@ -272,6 +281,17 @@ export default function Page() {
             onClick={() =>
               action(async () => {
                 await api("auth/logout", "POST");
+                refreshVersion.current++;
+                setAccounts([]);
+                setCategories([]);
+                setEntries([]);
+                setItems([]);
+                setBudgets([]);
+                setSummary({ totals: [], spending: [] });
+                setAccountFilter("");
+                setCategoryFilter("");
+                setOffset(0);
+                setLink("");
                 setRegister(false);
                 setUser(null);
               })

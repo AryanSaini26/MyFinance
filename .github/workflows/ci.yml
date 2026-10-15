@@ -41,6 +41,7 @@ jobs:
       - run: npm ci
       - run: npm run format:check
       - run: npm run model:train && git diff --exit-code -- packages/classifier/model.json services/sync/internal/syncer/model.json
+      - run: npm run preview:build
       - run: npm run typecheck
       - run: npm test
       - run: npm run db:migrate && npm run db:migrate

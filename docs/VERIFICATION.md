@@ -70,3 +70,9 @@ The test registered its own synthetic user and verified real Link-token creation
 The first attempt failed at Link-token creation with the app's sanitized 500 error; a subsequent isolated SDK check accepted the credentials, and the complete rerun passed. The initial failure's provider cause was not captured, so it is not attributed to invalid credentials or a specific outage. No new source change or automatic retry of token exchange was needed. The smoke run is not evidence of live modified/removed events, forced pagination, mutation errors or rollback faults; those paths have deterministic provider/PostgreSQL tests.
 
 [Run 38665793668](https://github.com/AryanSaini26/MyFinance/actions/runs/38665793668) also completed successfully on 8c4b1dd, including Docker and browser checks. Credentials are deliberately absent from normal CI. The hosted Link popup, load testing and production operation remain outside this verification.
+
+## Follow-up audit and browser demo
+
+The follow-up audit fixed workspace-state privacy, stale filter results, category/calendar validation and sanitized provider errors. Re-execution passed 20 unit tests, 11 Node/PostgreSQL integration tests, 18 Go tests with race detection and Go vet, and 3 browser workflows against the optimized application. Build, typecheck, formatting and dependency audit also passed. See FOLLOW_UP_AUDIT.md for findings and exact scope.
+
+The private Site at https://myfinance-aryan-demo.calmluck3.chatgpt.site hosts the same dashboard with a separate synthetic browser adapter, not the Node/Go/PostgreSQL backend. Its build and local browser interaction/mobile checks passed, and the native private deployment succeeded. The cloud browser reached its expected ChatGPT sign-in wall; access requires the owner's session. No real financial data or Plaid credentials are in that preview.

@@ -18,17 +18,19 @@
     "db:migrate": "node --import tsx scripts/migrate.ts",
     "model:train": "node --import tsx scripts/train.ts",
     "test:e2e": "playwright test",
-    "format": "prettier --write apps/web/src apps/web/next.config.ts packages/classifier/*.ts scripts tests *.ts *.json .github/workflows/*.yml compose*.yaml",
-    "format:check": "prettier --check apps/web/src apps/web/next.config.ts packages/classifier/*.ts scripts tests *.ts *.json .github/workflows/*.yml compose*.yaml",
+    "format": "prettier --write apps/web/src apps/web/next.config.ts packages/classifier/*.ts preview/*.ts preview/*.tsx preview/*.html scripts tests *.ts *.json .github/workflows/*.yml compose*.yaml",
+    "format:check": "prettier --check apps/web/src apps/web/next.config.ts packages/classifier/*.ts preview/*.ts preview/*.tsx preview/*.html scripts tests *.ts *.json .github/workflows/*.yml compose*.yaml",
     "env:init": "node scripts/env-init.mjs",
     "test:docker": "node scripts/test-docker.mjs",
     "check:node": "node scripts/check-node.mjs",
-    "test:sandbox": "node --import tsx scripts/sandbox-smoke.mjs"
+    "test:sandbox": "node --import tsx scripts/sandbox-smoke.mjs",
+    "preview:build": "node scripts/build-preview.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
     "@types/node": "^24.0.0",
     "@types/pg": "^8.15.0",
+    "esbuild": "^0.28.2",
     "prettier": "^3.9.10",
     "tsx": "^4.20.0",
     "typescript": "^5.9.0",

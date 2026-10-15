@@ -1,12 +1,20 @@
 import { z } from "zod";
 export const uuid = z.uuid();
 export const currency = z.enum(["CAD", "USD"]);
+export const category = z.string().min(1).max(40);
+export const calendarMonth = z
+  .string()
+  .regex(/^(?!0000)\d{4}-(0[1-9]|1[0-2])$/, "Invalid calendar month");
 export const date = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/)
   .refine((v) => {
     const d = new Date(v + "T00:00:00Z");
-    return !isNaN(d.getTime()) && d.toISOString().slice(0, 10) === v;
+    return (
+      !v.startsWith("0000") &&
+      !isNaN(d.getTime()) &&
+      d.toISOString().slice(0, 10) === v
+    );
   }, "Invalid calendar date");
 export const money = z
   .string()
@@ -29,7 +37,7 @@ export const entry = z
     description: z.string().trim().min(1).max(300),
     amount: money,
     date,
-    categoryId: z.string().max(40).optional(),
+    categoryId: category.optional(),
     idempotencyKey: z.string().min(8).max(100).optional(),
   })
   .strict();
